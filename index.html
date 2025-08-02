@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mood Swinger 3000</title>
+  <style>
+    body {
+      background-color: #fce4ec;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      padding: 60px;
+    }
+
+    h1 {
+      color: #d81b60;
+      font-size: 3em;
+      margin-bottom: 20px;
+      animation: bounce 1.5s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background-color: #ec407a;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #c2185b;
+      transform: scale(1.1);
+    }
+
+    .output {
+      margin-top: 40px;
+      font-size: 1.4em;
+      color: #6a1b9a;
+      min-height: 120px;
+    }
+
+    .emoji {
+      font-size: 2.5em;
+      margin-top: 10px;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 0.9em;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌀 Mood Swinger 3000 🌀</h1>
+
+  <button onclick="swingMood()">🔮 Analyze My Mood</button>
+
+  <div class="output" id="result">
+    <p class="emoji">🤔</p>
+    <p>Click the magic button to begin your nonsense journey.</p>
+  </div>
+
+  <footer>Made with 0% logic and 100% chaos 🤡</footer>
+
+  <script>
+    const moods = [
+      "Confused potato 🥔",
+      "Electrified chicken 🐔",
+      "Melancholic dolphin 🐬",
+      "Hyperactive toaster 🔌",
+      "Suspicious banana 🍌",
+      "Zen broccoli 🥦",
+      "Overcooked penguin 🐧",
+      "Plotting squirrel 🐿️",
+      "Bored ceiling fan 🌀",
+      "Mildly aggressive pancake 🥞"
+    ];
+
+    const advice = [
+      "Go scream into your sock drawer. It helps.",
+      "Dance like no one is watching... in traffic (please don't).",
+      "Convince your pet to start a podcast.",
+      "Lick a lemon and pretend it told your future.",
+      "Yell at the moon for emotional closure.",
+      "Name all your houseplants after politicians.",
+      "Write a song about soup.",
+      "Blink aggressively at people to assert dominance.",
+      "Try to high-five yourself in the mirror.",
+      "Tell your fridge your secrets. It's cool with it."
+    ];
+
+    function swingMood() {
+      const mood = moods[Math.floor(Math.random() * moods.length)];
+      const badAdvice = advice[Math.floor(Math.random() * advice.length)];
+      const emoji = "🎲";
+
+      document.getElementById("result").innerHTML = `
+        <p class="emoji">${emoji}</p>
+        <p><strong>Your Mood:</strong> ${mood}</p>
+        <p><strong>Advice:</strong> ${badAdvice}</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
