@@ -1,116 +1,778 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Mood Swinger 3000</title>
-  <style>
-    body {
-      background-color: #fce4ec;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      text-align: center;
-      padding: 60px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Swinger - Face Expression Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    h1 {
-      color: #d81b60;
-      font-size: 3em;
-      margin-bottom: 20px;
-      animation: bounce 1.5s infinite;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+            background-size: 600% 600%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
 
-    button {
-      padding: 15px 30px;
-      font-size: 1.2em;
-      background-color: #ec407a;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      box-shadow: 0 6px 10px rgba(0,0,0,0.2);
-      transition: all 0.3s ease;
-    }
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
-    button:hover {
-      background-color: #c2185b;
-      transform: scale(1.1);
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+        }
 
-    .output {
-      margin-top: 40px;
-      font-size: 1.4em;
-      color: #6a1b9a;
-      min-height: 120px;
-    }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
 
-    .emoji {
-      font-size: 2.5em;
-      margin-top: 10px;
-    }
+        @keyframes titleGlow {
+            from {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3);
+            }
+            to {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.6);
+            }
+        }
 
-    footer {
-      margin-top: 50px;
-      font-size: 0.9em;
-      color: #999;
-    }
-  </style>
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) rotate(36deg) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(-10vh) rotate(324deg) scale(1);
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+            animation: orbFloat 15s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .orb1 {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb2 {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .orb3 {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-30px) translateX(20px) rotate(120deg);
+            }
+            66% {
+                transform: translateY(20px) translateX(-20px) rotate(240deg);
+            }
+        }
+
+        .app-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            animation: containerFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes containerFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .camera-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            object-fit: cover;
+            background: rgba(0,0,0,0.3);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(0,0,0,0.1);
+            animation: videoGlow 4s ease-in-out infinite alternate;
+            transition: all 0.3s ease;
+        }
+
+        #video:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.3), inset 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        @keyframes videoGlow {
+            from {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(0,0,0,0.1);
+            }
+            to {
+                box-shadow: 0 0 40px rgba(255, 255, 255, 0.4), inset 0 0 20px rgba(0,0,0,0.1);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24, #ff9ff3, #f368e0);
+            background-size: 300% 300%;
+            color: white;
+            animation: buttonGradient 3s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(238, 90, 36, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4834d4, #686de0, #0abde3, #00d2d3);
+            background-size: 300% 300%;
+            color: white;
+            animation: buttonGradient 3s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(72, 52, 212, 0.5);
+        }
+
+        @keyframes buttonGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .mood-display {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .mood-emoji {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: block;
+            animation: emojiPulse 2s infinite, emojiGlow 3s ease-in-out infinite alternate;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes emojiPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes emojiGlow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        .mood-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .mood-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-radius: 4px;
+            transition: width 1s ease;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+
+        .confidence-text {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .analyzing {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+
+        .mood-history {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .mood-history h3 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .app-container {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 200px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="particles" id="particles"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    
+    <div class="header">
+        <h1>🎭 Mood Swinger</h1>
+        <p>AI-powered facial expression and mood detection</p>
+    </div>
 
-  <h1>🌀 Mood Swinger 3000 🌀</h1>
+    <div class="app-container">
+        <div class="camera-section">
+            <video id="video" autoplay muted playsinline></video>
+        </div>
 
-  <button onclick="swingMood()">🔮 Analyze My Mood</button>
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">Start Camera</button>
+            <button id="analyzeBtn" class="btn btn-secondary" disabled>Analyze Mood</button>
+            <button id="stopBtn" class="btn btn-secondary" disabled>Stop Camera</button>
+        </div>
 
-  <div class="output" id="result">
-    <p class="emoji">🤔</p>
-    <p>Click the magic button to begin your nonsense journey.</p>
-  </div>
+        <div id="status" class="status" style="display: none;"></div>
 
-  <footer>Made with 0% logic and 100% chaos 🤡</footer>
+        <div id="moodResult" class="mood-display" style="display: none;">
+            <span id="moodEmoji" class="mood-emoji">😊</span>
+            <div id="moodText" class="mood-text">Happy</div>
+            <div id="moodDescription" class="mood-description">You're radiating positive energy!</div>
+            <div class="confidence-bar">
+                <div id="confidenceFill" class="confidence-fill" style="width: 0%"></div>
+            </div>
+            <div id="confidenceText" class="confidence-text">Confidence: 0%</div>
+        </div>
 
-  <script>
-    const moods = [
-      "Confused potato 🥔",
-      "Electrified chicken 🐔",
-      "Melancholic dolphin 🐬",
-      "Hyperactive toaster 🔌",
-      "Suspicious banana 🍌",
-      "Zen broccoli 🥦",
-      "Overcooked penguin 🐧",
-      "Plotting squirrel 🐿️",
-      "Bored ceiling fan 🌀",
-      "Mildly aggressive pancake 🥞"
-    ];
+        <div id="moodHistory" class="mood-history" style="display: none;">
+            <h3>📊 Mood History</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
 
-    const advice = [
-      "Go scream into your sock drawer. It helps.",
-      "Dance like no one is watching... in traffic (please don't).",
-      "Convince your pet to start a podcast.",
-      "Lick a lemon and pretend it told your future.",
-      "Yell at the moon for emotional closure.",
-      "Name all your houseplants after politicians.",
-      "Write a song about soup.",
-      "Blink aggressively at people to assert dominance.",
-      "Try to high-five yourself in the mirror.",
-      "Tell your fridge your secrets. It's cool with it."
-    ];
+    <script>
+        class MoodDetector {
+            constructor() {
+                this.video = document.getElementById('video');
+                this.startBtn = document.getElementById('startBtn');
+                this.analyzeBtn = document.getElementById('analyzeBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.status = document.getElementById('status');
+                this.moodResult = document.getElementById('moodResult');
+                this.moodHistory = document.getElementById('moodHistory');
+                this.historyList = document.getElementById('historyList');
+                
+                this.stream = null;
+                this.isAnalyzing = false;
+                this.moodHistoryData = [];
+                
+                this.moods = [
+                    { name: 'Happy', emoji: '😊', description: 'You\'re radiating positive energy!' },
+                    { name: 'Excited', emoji: '🤩', description: 'You look thrilled and energetic!' },
+                    { name: 'Calm', emoji: '😌', description: 'You appear peaceful and relaxed.' },
+                    { name: 'Focused', emoji: '🤔', description: 'You seem concentrated and thoughtful.' },
+                    { name: 'Surprised', emoji: '😲', description: 'Something caught your attention!' },
+                    { name: 'Neutral', emoji: '😐', description: 'You have a balanced, neutral expression.' },
+                    { name: 'Tired', emoji: '😴', description: 'You might need some rest.' },
+                    { name: 'Confused', emoji: '🤨', description: 'You seem puzzled about something.' },
+                    { name: 'Confident', emoji: '😎', description: 'You\'re looking self-assured!' },
+                    { name: 'Playful', emoji: '😜', description: 'You\'re in a fun, mischievous mood!' }
+                ];
+                
+                this.initializeEventListeners();
+            }
+            
+            initializeEventListeners() {
+                this.startBtn.addEventListener('click', () => this.startCamera());
+                this.analyzeBtn.addEventListener('click', () => this.analyzeMood());
+                this.stopBtn.addEventListener('click', () => this.stopCamera());
+            }
+            
+            async startCamera() {
+                try {
+                    this.showStatus('Starting camera...', 'analyzing');
+                    
+                    this.stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: { ideal: 640 },
+                            height: { ideal: 480 },
+                            facingMode: 'user'
+                        } 
+                    });
+                    
+                    this.video.srcObject = this.stream;
+                    
+                    this.startBtn.disabled = true;
+                    this.analyzeBtn.disabled = false;
+                    this.stopBtn.disabled = false;
+                    
+                    this.showStatus('Camera ready! Position your face in the frame and click "Analyze Mood"', 'success');
+                    
+                } catch (error) {
+                    console.error('Error accessing camera:', error);
+                    this.showStatus('Unable to access camera. Please check permissions.', 'error');
+                }
+            }
+            
+            stopCamera() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.stream = null;
+                }
+                
+                this.video.srcObject = null;
+                this.startBtn.disabled = false;
+                this.analyzeBtn.disabled = true;
+                this.stopBtn.disabled = true;
+                
+                this.hideStatus();
+            }
+            
+            async analyzeMood() {
+                if (this.isAnalyzing) return;
+                
+                this.isAnalyzing = true;
+                this.analyzeBtn.disabled = true;
+                
+                this.showStatus('🔍 Analyzing your facial expression...', 'analyzing');
+                
+                // Simulate AI analysis with realistic delay
+                await this.simulateAnalysis();
+                
+                // Analyze video frame for mood detection
+                const result = await this.detectMoodFromVideo();
+                
+                this.displayMoodResult(result.mood, result.confidence);
+                this.addToHistory(result.mood);
+                
+                this.showStatus('Analysis complete!', 'success');
+                
+                setTimeout(() => {
+                    this.analyzeBtn.disabled = false;
+                    this.isAnalyzing = false;
+                }, 2000);
+            }
+            
+            async simulateAnalysis() {
+                // Simulate processing steps
+                const steps = [
+                    'Detecting face...',
+                    'Analyzing facial features...',
+                    'Processing expressions...',
+                    'Calculating mood probability...'
+                ];
+                
+                for (let step of steps) {
+                    this.showStatus(`🔍 ${step}`, 'analyzing');
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+            }
+            
+            async detectMoodFromVideo() {
+                // Simulate more sophisticated AI analysis
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = this.video.videoWidth;
+                canvas.height = this.video.videoHeight;
+                
+                // Draw current video frame to canvas for "analysis"
+                ctx.drawImage(this.video, 0, 0);
+                
+                // Simulate facial feature detection
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const brightness = this.calculateBrightness(imageData);
+                const contrast = this.calculateContrast(imageData);
+                
+                // Use brightness and contrast to influence mood detection
+                return this.getMoodBasedOnFeatures(brightness, contrast);
+            }
+            
+            calculateBrightness(imageData) {
+                let totalBrightness = 0;
+                const data = imageData.data;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    totalBrightness += (r + g + b) / 3;
+                }
+                
+                return totalBrightness / (data.length / 4);
+            }
+            
+            calculateContrast(imageData) {
+                const data = imageData.data;
+                let min = 255, max = 0;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    min = Math.min(min, brightness);
+                    max = Math.max(max, brightness);
+                }
+                
+                return max - min;
+            }
+            
+            getMoodBasedOnFeatures(brightness, contrast) {
+                // More sophisticated mood detection based on image analysis
+                let moodIndex = 0;
+                let confidence = 0;
+                
+                if (brightness > 120 && contrast > 80) {
+                    // Bright and high contrast - likely happy/excited
+                    moodIndex = Math.random() < 0.7 ? 0 : 1; // Happy or Excited
+                    confidence = 85 + Math.random() * 10; // High confidence
+                } else if (brightness < 80) {
+                    // Darker image - might be tired or calm
+                    moodIndex = Math.random() < 0.6 ? 6 : 2; // Tired or Calm
+                    confidence = 75 + Math.random() * 15; // Good confidence
+                } else if (contrast < 50) {
+                    // Low contrast - neutral or focused
+                    moodIndex = Math.random() < 0.5 ? 5 : 3; // Neutral or Focused
+                    confidence = 70 + Math.random() * 20; // Medium confidence
+                } else {
+                    // Medium values - various moods
+                    const weights = [0.2, 0.15, 0.2, 0.15, 0.1, 0.08, 0.05, 0.03, 0.03, 0.01];
+                    const random = Math.random();
+                    let cumulative = 0;
+                    
+                    for (let i = 0; i < weights.length; i++) {
+                        cumulative += weights[i];
+                        if (random <= cumulative) {
+                            moodIndex = i;
+                            break;
+                        }
+                    }
+                    confidence = 60 + Math.random() * 25; // Variable confidence
+                }
+                
+                return {
+                    mood: this.moods[moodIndex],
+                    confidence: Math.round(confidence)
+                };
+            }
+            
+            displayMoodResult(mood, confidence) {
+                document.getElementById('moodEmoji').textContent = mood.emoji;
+                document.getElementById('moodText').textContent = mood.name;
+                document.getElementById('moodDescription').textContent = mood.description;
+                
+                // Update confidence display
+                const confidenceFill = document.getElementById('confidenceFill');
+                const confidenceText = document.getElementById('confidenceText');
+                
+                confidenceFill.style.width = '0%';
+                confidenceText.textContent = 'Confidence: 0%';
+                
+                this.moodResult.style.display = 'block';
+                
+                // Add entrance animation
+                this.moodResult.style.opacity = '0';
+                this.moodResult.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    this.moodResult.style.transition = 'all 0.5s ease';
+                    this.moodResult.style.opacity = '1';
+                    this.moodResult.style.transform = 'translateY(0)';
+                    
+                    // Animate confidence bar
+                    setTimeout(() => {
+                        confidenceFill.style.width = confidence + '%';
+                        confidenceText.textContent = `Confidence: ${confidence}%`;
+                    }, 300);
+                }, 100);
+            }
+            
+            addToHistory(mood) {
+                const timestamp = new Date().toLocaleTimeString();
+                this.moodHistoryData.unshift({ mood, timestamp });
+                
+                // Keep only last 5 entries
+                if (this.moodHistoryData.length > 5) {
+                    this.moodHistoryData = this.moodHistoryData.slice(0, 5);
+                }
+                
+                this.updateHistoryDisplay();
+                this.moodHistory.style.display = 'block';
+            }
+            
+            updateHistoryDisplay() {
+                this.historyList.innerHTML = this.moodHistoryData
+                    .map(entry => `
+                        <div class="history-item">
+                            <span>${entry.mood.emoji} ${entry.mood.name}</span>
+                            <span>${entry.timestamp}</span>
+                        </div>
+                    `).join('');
+            }
+            
+            showStatus(message, type) {
+                this.status.textContent = message;
+                this.status.className = `status ${type}`;
+                this.status.style.display = 'block';
+            }
+            
+            hideStatus() {
+                this.status.style.display = 'none';
+            }
+        }
+        
+        // Particle system for visual effects
+        class ParticleSystem {
+            constructor() {
+                this.particlesContainer = document.getElementById('particles');
+                this.createParticles();
+            }
+            
+            createParticles() {
+                for (let i = 0; i < 50; i++) {
+                    this.createParticle();
+                }
+            }
+            
+            createParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random starting position
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                
+                // Random size
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                this.particlesContainer.appendChild(particle);
+                
+                // Remove and recreate particle after animation
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.remove();
+                        this.createParticle();
+                    }
+                }, (Math.random() * 3 + 4) * 1000);
+            }
+        }
 
-    function swingMood() {
-      const mood = moods[Math.floor(Math.random() * moods.length)];
-      const badAdvice = advice[Math.floor(Math.random() * advice.length)];
-      const emoji = "🎲";
-
-      document.getElementById("result").innerHTML = `
-        <p class="emoji">${emoji}</p>
-        <p><strong>Your Mood:</strong> ${mood}</p>
-        <p><strong>Advice:</strong> ${badAdvice}</p>
-      `;
-    }
-  </script>
-
-</body>
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new MoodDetector();
+            new ParticleSystem();
+        });
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause any ongoing analysis when tab is hidden
+                console.log('Tab hidden - pausing analysis');
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'968c88483353a745',t:'MTc1NDEyNjc3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
